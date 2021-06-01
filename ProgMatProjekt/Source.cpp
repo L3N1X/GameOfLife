@@ -1,7 +1,7 @@
 #include <iostream>
 #include <ctime>
 #include <chrono>
-#include <queue>
+#include <set>
 #include <fstream>
 
 #include"Game.h"
@@ -115,7 +115,7 @@ int main()
 	colorBlueButton.setHoverTextures("\Textures\\blueHovered.png", "\Textures\\blueHovered.png");
 	colorBlueButton.setSounds("\Sounds\\mehSound.ogg", "\Sounds\\fartSound.ogg");
 
-	std::queue<std::pair<int, int>> previousState;
+	std::set<std::pair<int, int>> previousState;
 	int colorSelection{ 1 };
 
 	//Main variables end
@@ -165,10 +165,9 @@ int main()
 				else if (undoButton.isMouseOver(window) && playButton.is_active()) //Kliknut je undoButton
 				{
 					undoButton.playClickSound();
-					while (!previousState.empty())
+					for (auto& i : previousState)
 					{
-						game.set_startField(previousState.front().first, previousState.front().second);
-						previousState.pop();
+						game.set_startField(i.first, i.second);
 					}
 				}
 			}
@@ -211,7 +210,7 @@ int main()
 				if (!isMouseInCornerSquare(aliveCoordinates, game.get_x_axis(), game.get_y_axis()))
 				{
 					game.set_startField(aliveCoordinates.first, aliveCoordinates.second);
-					previousState.push(aliveCoordinates);
+					previousState.insert(aliveCoordinates);
 				}
 			}
 		}
@@ -239,13 +238,9 @@ int main()
 		std::cout << "ERROR: File can't open" << std::endl;
 		return 1;
 	}
-	out << "x;y" << std::endl;
-	while (!previousState.empty())
-		//Problem kod previouseStatea je sto sprema duplikate
+	for (auto& i : previousState)
 	{
-		out << previousState.front().first << ";" << previousState.front().second
-			<< std::endl;
-		previousState.pop();
+		out << i.first << ";" << i.second << std::endl;
 	}
 	out.close();
 	//Debug end
